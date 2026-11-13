@@ -16,3 +16,8 @@ def load_sequences(file_path):
     except FileNotFoundError:
         print("Error: Input file not found")
         return []
+        print("Total sequences loaded:", len(sequences))
+
+        for sequence in sequences:
+            print("Sequence:", sequence)
+            print("Length:", len(sequence))
