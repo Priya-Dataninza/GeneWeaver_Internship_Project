@@ -1,6 +1,6 @@
 
 from geneweaver.parser.fasta_parser import parse_fasta
-from geneweaver.cpu.baseline import search_off_targets
+from geneweaver.cpu.baseline import search_both_strands
 
 
 def main():
@@ -9,7 +9,7 @@ def main():
     genome_data = parse_fasta("data/sample_genome.fasta")
 
     for chromosome, sequence in genome_data.items():
-        results = search_off_targets(
+        results = search_both_strands(
             guide,
             sequence,
             max_mismatches=2

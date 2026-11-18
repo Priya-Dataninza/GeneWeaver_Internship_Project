@@ -57,3 +57,58 @@ def search_off_targets(
             })
 
     return results
+
+
+
+def reverse_complement(sequence):
+    """Return the reverse complement of a DNA sequence."""
+    complement = str.maketrans(
+        "ACGTN",
+        "TGCAN"
+    )
+    return sequence.upper().translate(complement)[::-1]
+
+
+def search_both_strands(
+    guide,
+    genome,
+    max_mismatches=2
+):
+    """Search both forward and reverse DNA strands."""
+
+    genome = genome.upper()
+
+    # Search the forward strand
+    forward_results = search_off_targets(
+        guide,
+        genome,
+        max_mismatches
+    )
+
+    for result in forward_results:
+        result["strand"] = "+"
+
+    # Search the reverse-complement strand
+    reverse_genome = reverse_complement(genome)
+
+    reverse_results = search_off_targets(
+        guide,
+        reverse_genome,
+        max_mismatches
+    )
+
+    # Convert reverse-oriented positions to reference coordinates
+    window_length = len(guide) + 3
+
+    for result in reverse_results:
+        result["position"] = (
+            len(genome)
+            - result["position"]
+            - window_length
+        )
+        result["strand"] = "-"
+
+    return sorted(
+        forward_results + reverse_results,
+        key=lambda result: result["position"]
+    )
