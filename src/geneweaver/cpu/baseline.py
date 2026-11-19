@@ -69,6 +69,22 @@ def reverse_complement(sequence):
     return sequence.upper().translate(complement)[::-1]
 
 
+def validate_dna(sequence):
+    """Validate that a DNA sequence contains only A, C, G, T."""
+    sequence = sequence.upper()
+
+    if not sequence:
+        raise ValueError("DNA sequence cannot be empty.")
+
+    invalid_bases = set(sequence) - {"A", "C", "G", "T"}
+
+    if invalid_bases:
+        raise ValueError(
+            f"Invalid DNA bases found: {sorted(invalid_bases)}"
+        )
+
+    return sequence
+
 def search_both_strands(
     guide,
     genome,
@@ -76,8 +92,8 @@ def search_both_strands(
 ):
     """Search both forward and reverse DNA strands."""
 
-    genome = genome.upper()
-
+    guide = validate_dna(guide)
+    genome = validate_dna(genome)
     # Search the forward strand
     forward_results = search_off_targets(
         guide,
@@ -112,3 +128,6 @@ def search_both_strands(
         forward_results + reverse_results,
         key=lambda result: result["position"]
     )
+
+
+
