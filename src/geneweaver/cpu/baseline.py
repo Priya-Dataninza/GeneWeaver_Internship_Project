@@ -1,3 +1,76 @@
+import time
+
+
+def needleman_wunsch(
+    sequence_a,
+    sequence_b,
+    match=2,
+    mismatch=-1,
+    gap=-2
+):
+    """
+    Perform global DNA sequence alignment
+    using the Needleman-Wunsch algorithm.
+    """
+
+    sequence_a = validate_dna(sequence_a)
+    sequence_b = validate_dna(sequence_b)
+
+    rows = len(sequence_a) + 1
+    cols = len(sequence_b) + 1
+
+    # Initialize scoring matrix
+    matrix = [
+        [0] * cols
+        for _ in range(rows)
+    ]
+
+    for i in range(rows):
+        matrix[i][0] = i * gap
+
+    for j in range(cols):
+        matrix[0][j] = j * gap
+
+    # Dynamic programming
+    for i in range(1, rows):
+        for j in range(1, cols):
+
+            score = (
+                match
+                if sequence_a[i - 1] == sequence_b[j - 1]
+                else mismatch
+            )
+
+            diagonal = matrix[i - 1][j - 1] + score
+            up = matrix[i - 1][j] + gap
+            left = matrix[i][j - 1] + gap
+
+            matrix[i][j] = max(
+                diagonal,
+                up,
+                left
+            )
+
+    return matrix[-1][-1]
+
+
+def benchmark_alignment(sequence_a, sequence_b):
+    """Measure Needleman-Wunsch execution time."""
+
+    start_time = time.perf_counter()
+
+    score = needleman_wunsch(
+        sequence_a,
+        sequence_b
+    )
+
+    elapsed_time = time.perf_counter() - start_time
+
+    return {
+        "alignment_score": score,
+        "execution_time_seconds": elapsed_time
+    }
+
 
 def count_mismatches(guide, candidate):
     """Count differences between guide and candidate DNA."""
