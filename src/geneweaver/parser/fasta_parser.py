@@ -1,39 +1,26 @@
+from Bio import SeqIO
+import numpy as np
 
 def parse_fasta(file_path):
     """
-    Read a FASTA file and return its DNA sequences.
+    Read a FASTA file using BioPython.
 
     Returns:
         dict: {sequence_header: DNA_sequence}
     """
     sequences = {}
-    current_header = None
-    current_sequence = []
 
-    with open(file_path, "r", encoding="utf-8") as fasta_file:
-        for line in fasta_file:
-            line = line.strip()
+    for record in SeqIO.parse(file_path, "fasta"):
+        header = record.description
+        sequence = str(record.seq).upper()
 
-            if not line:
-                continue
+        if sequence:
+            sequences[header] = sequence
 
-            if line.startswith(">"):
-                if current_header is not None:
-                    sequences[current_header] = "".join(current_sequence)
-
-                current_header = line[1:].strip()
-                current_sequence = []
-            else:
-                if current_header is None:
-                    raise ValueError("Invalid FASTA: sequence found before header")
-
-                current_sequence.append(line.upper())
-
-    if current_header is not None:
-        sequences[current_header] = "".join(current_sequence)
+    if not sequences:
+        raise ValueError("No valid FASTA sequences found.")
 
     return sequences
-
 
 def chunk_sequence(sequence, chunk_size=100_000):
     """
@@ -72,3 +59,38 @@ def parse_fasta_in_chunks(file_path, chunk_size=100_000):
                 "sequence": chunk["sequence"]
             }
 
+DNA_ENCODING = {
+    "A": 0,
+    "C": 1,
+    "G": 2,
+    "T": 3,
+    "N": 4
+}
+
+
+def encode_dna(sequence):
+    """Convert DNA sequence into a NumPy uint8 array."""
+
+    sequence = sequence.upper()
+
+    invalid = set(sequence) - set(DNA_ENCODING)
+
+    if invalid:
+        raise ValueError(f"Invalid DNA characters: {invalid}")
+
+    return np.fromiter(
+        (DNA_ENCODING[base] for base in sequence),
+        dtype=np.uint8,
+        count=len(sequence)
+    )
+
+
+def parse_fasta_array_chunks(file_path, chunk_size=100_000):
+    """Generate encoded NumPy arrays from FASTA chunks."""
+
+    for chunk in parse_fasta_in_chunks(file_path, chunk_size):
+        yield {
+            "header": chunk["header"],
+            "start": chunk["start"],
+            "sequence": encode_dna(chunk["sequence"])
+        }
