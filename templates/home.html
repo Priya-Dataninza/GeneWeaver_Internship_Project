@@ -618,6 +618,15 @@
                 </div>
                 <div class="stat-note">Matching candidates found</div>
             </div>
+            <div class="stat-card">
+    <h3>Forward Strand Hits</h3>
+    <p>{{ analysis.forward_hits|default:0 }}</p>
+</div>
+
+<div class="stat-card">
+    <h3>Reverse Strand Hits</h3>
+    <p>{{ analysis.reverse_hits|default:0 }}</p>
+</div>
 
             <div class="stat-card">
                 <div class="stat-top">

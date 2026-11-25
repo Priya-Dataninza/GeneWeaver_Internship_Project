@@ -92,7 +92,14 @@ def home(request):
                 "max_mismatches": max_mismatches,
                 "results": all_results,
                 "status": "Completed",
-                "mode": "CPU"
+                "mode": "CPU",
+                "forward_hits": sum(
+                    1 for result in all_results if result.get("strand") == "+"
+                ),
+
+                "reverse_hits": sum(
+                    1 for result in all_results if result.get("strand") == "-"
+                ),
             }
 
         except (ValueError, OSError) as error:
