@@ -189,4 +189,13 @@ The development laptop uses Intel Iris Xe integrated graphics and does not provi
 
 ---
 
+
+### Forward and Reverse Strand Analysis
+
+- Added separate counters for forward (+) and reverse (-) DNA strand off-target hits.
+- Displays the number of detected candidates on each strand.
+- Helps users understand how off-target matches are distributed across both DNA strands.
+- Integrated strand statistics into the Django dashboard using real analysis results.
+
+
 **GeneWeaver – Exploring GPU Acceleration for Bioinformatics and High-Performance Computing.**
